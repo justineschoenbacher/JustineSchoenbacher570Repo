@@ -3,3 +3,34 @@ title: "Reproducability Assignment Schoenbacher"
 output: html_document
 ---
 
+#set up opening data files
+```{r}
+library(readr)
+library(tidyverse)
+```
+```{r}
+gdp_5267 <- readr::read_csv("../inputs/gdp_5267.csv")
+```
+
+gdp per capita
+```{r}
+gdp_5267 <- gdp_5267 %>%
+  dplyr::mutate(gdppercap = gdp/pop)
+```
+
+table for canada
+```{r}
+canada <- gdp_5267 %>%
+  dplyr::filter(country == "Canada")
+```
+
+visualize data
+```{r}
+ggplot2::ggplot(data = canada,
+                aes(x = year,
+                    y = gdppercap)) +
+  geom_line() +
+  labs(y = "gdp per cap in Canada",
+       x = "Year") +
+  theme_bw()
+```
