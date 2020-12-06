@@ -10,27 +10,43 @@ library(tidyverse)
 ```
 ```{r}
 gdp_5267 <- readr::read_csv("../inputs/gdp_5267.csv")
+le_5267 <- readr::read_csv("../inputs/le_52-67.csv")
 ```
 
 gdp per capita
 ```{r}
 gdp_5267 <- gdp_5267 %>%
-  dplyr::mutate(gdppercap = gdp/pop)
+  dplyr::mutate(gdppercap = gdp/pop) 
+
+#gdp and lifeExp in one dataset
+dsall <- cbind(gdp_5267, lifeExp = le_5267$lifeExp)
 ```
 
 table for canada
 ```{r}
-canada <- gdp_5267 %>%
+canada <- dsall %>%
   dplyr::filter(country == "Canada")
 ```
 
 visualize data
 ```{r}
-ggplot2::ggplot(data = canada,
-                aes(x = year,
-                    y = gdppercap)) +
-  geom_line() +
+coeff <- 200
+ggplot2::ggplot(data = canada, aes(x = year)) +
+  geom_line(aes(y = gdppercap,
+                color = "gdp")) +
+  geom_line(aes(y = lifeExp*coeff,
+                color = "life expectancy")) +
   labs(y = "gdp per cap in Canada",
-       x = "Year") +
+       y = "life expectancy",
+       x = "Year",
+       colour = "") +
+   scale_y_continuous(name = "gdp per cap",
+                     sec.axis = sec_axis(~./coeff, name = "life expectancy")) +
   theme_bw()
+```
+regression
+```{r}
+dataset <- canada
+ldm <- lm(gdppercap ~ lifeExp, data = dataset)
+summary.lm(ldm)
 ```
